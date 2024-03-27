@@ -1,5 +1,5 @@
 
-import psycopg2 , os
+import psycopg2 , os, time
 
 from psycopg2 import Error
 
@@ -13,7 +13,8 @@ try:
                                   database=os.environ["DB_NAME"])
     
     cursor = connection.cursor()
-
+#сюда делей
+    time.sleep(1200)
     create_table_query = '''CREATE TABLE mobile
                           (ID INT PRIMARY KEY     NOT NULL,
                           MODEL           TEXT    NOT NULL,
@@ -38,17 +39,15 @@ try:
 
 
     postgreSQL_select_Query = "select * from mobile"
-    runing = True
-    while runing:
-        cursor.execute(postgreSQL_select_Query)
-        print("Выбор строк из таблицы mobile с помощью cursor.fetchall")
-        mobile_records = cursor.fetchall()
-        print("Вывод каждой строки и ее столбцов")
-        for row in mobile_records:
+    cursor.execute(postgreSQL_select_Query)
+    print("Выбор строк из таблицы mobile с помощью cursor.fetchall")
+    mobile_records = cursor.fetchall()
+    print("Вывод каждой строки и ее столбцов")
+    for row in mobile_records:
             print("Id =", row[0], )
             print("model =", row[1])
             print("price =", row[2], "\n")
-
+        
 except (Exception, Error) as error:
         print("Ошибка при работе с PostgreSQL", error)
 finally:

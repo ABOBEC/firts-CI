@@ -2,10 +2,13 @@ services:
 
   ptcript:
     image: python.scrypt:1
-    restart: always
-  
+    build: https://github.com/ABOBEC/Docker.git#main:PG
+    
+ 
 
 
+
+    
   db:
     image: postgres
     restart: always
