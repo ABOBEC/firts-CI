@@ -14,7 +14,7 @@ try:
     
     cursor = connection.cursor()
 #сюда делей
-    time.sleep(1200)
+    time.sleep(60)
     create_table_query = '''CREATE TABLE mobile
                           (ID INT PRIMARY KEY     NOT NULL,
                           MODEL           TEXT    NOT NULL,
