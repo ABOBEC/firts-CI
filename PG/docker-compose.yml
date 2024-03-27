@@ -3,7 +3,9 @@ services:
   ptcript:
     image: python.scrypt:1
     build: https://github.com/ABOBEC/Docker.git#master:PG
-    
+    restart: 'no'
+    links:
+      - "db:database"
  
 
 

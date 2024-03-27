@@ -4,6 +4,7 @@ import psycopg2 , os, time
 from psycopg2 import Error
 
 try:
+    time.sleep(40)
     # Подключиться к существующей базе данных
     connection = psycopg2.connect(user=os.environ["DB_USER"],
                                   # пароль, который указали при установке PostgreSQL
@@ -14,7 +15,7 @@ try:
     
     cursor = connection.cursor()
 #сюда делей
-    time.sleep(60)
+    
     create_table_query = '''CREATE TABLE mobile
                           (ID INT PRIMARY KEY     NOT NULL,
                           MODEL           TEXT    NOT NULL,
