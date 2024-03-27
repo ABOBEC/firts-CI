@@ -2,7 +2,7 @@ FROM python:3-alpine
 
 WORKDIR /usr/src/app
 
-ENV DB_HOST="127.0.0.1\
+ENV DB_HOST="127.0.0.1"\
  DB_PORT="5432"\
  DB_USER="user"\
  DB_PASS="user"\
