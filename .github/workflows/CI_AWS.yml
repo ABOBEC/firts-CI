@@ -3,7 +3,7 @@ name: CI
 on: [push]
 
 jobs:
-  build:
+   build:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,10 +33,30 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
         
-    - name: Run containers on AWS ECS
-      run: |
+   deploy:
+     runs-on: ubuntu-latest
+     steps:
+
+     - name: Copy to Remote Server
+       uses: pierrickdelrieu/scp-action@v0.1.0
+       with:
+        host: ${{ secrets.DESTINATION_HOST }}
+        ssh_port: 22
+        ssh_username: ${{ secrets.SSH_USERNAME }}
+        ssh_key: ${{ secrets.SSH_KEY }}
+        source_dir: ${{ secrets.SOURCE_FOLDER }}
+        destination_dir: ${{ secrets.DESTINATION_FOLDER }}
+        rm: true
+
+
+
+
+   # - name: Run containers on AWS ECS
+    #  run: |
+      #    scp /path/to/file username@a:/path/to/destination
+     
         # Replace this with your own command to deploy and run containers on AWS ECS
-        echo "Deploying containers to AWS ECS..."
+      #  echo "Deploying containers to AWS ECS..."
         # Example command for running a single container
         # docker run -d --name my-container my-image:latest
         # Example command for running multiple containers
