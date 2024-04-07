@@ -39,15 +39,15 @@ jobs:
      steps:
 
      - name: Copy to Remote Server
-       uses: appleboy/scp-action@v0.1.7
-       
-       with:
+       uses: appleboy/scp-action@master
+       env: 
         host: ${{ secrets.DESTINATION_HOST }}
         port: 22
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_KEY }}
-        source: ${{ secrets.SOURCE_FOLDER }}
-        target: ${{ secrets.DESTINATION_FOLDER }}
+       with:  
+        source: "https://github.com/ABOBEC/firts-CI"
+        target: "/home/ubuntu/docker-run/"
 
 
 
