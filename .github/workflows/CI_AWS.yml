@@ -55,10 +55,9 @@
              context: .
              file: ./docker-compose.yml
              push: true
-             tags: yourusername/yourimage:latest
    
          - name: Deploy to AWS EC2
-           uses: appleboy/ssh-action@master
+           uses: appleboy/scp-action@master
            with:
              host: "18.153.120.172"
              username: "ubuntu"
