@@ -16,7 +16,7 @@ jobs:
       run: ls -la
     
     - name: Build the Docker image
-      run: docker build .Dockerfile --tag my-image:latest
+      run: docker build . Dockerfile --tag my-image:latest
       
     - name: Log in to Docker Hub
       uses: docker/login-action@v1
