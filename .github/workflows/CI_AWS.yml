@@ -15,7 +15,7 @@ jobs:
       run: ls -la
     
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image:latest
+      run: docker build . --file Dockerfile --abobec/first_ci:latest
       
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
@@ -24,7 +24,7 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         
     - name: Push Docker image to Docker Hub
-      run: docker push my-image:latest
+      run: docker push abobec/first_ci:latest
       
     - name: Set up AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
