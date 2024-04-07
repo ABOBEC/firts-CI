@@ -40,14 +40,14 @@ jobs:
 
      - name: Copy to Remote Server
        uses: appleboy/scp-action@v0.1.7
+       
        with:
         host: ${{ secrets.DESTINATION_HOST }}
-        ssh_port: 22
-        ssh_username: ${{ secrets.SSH_USERNAME }}
-        ssh_key: ${{ secrets.SSH_KEY }}
-        source_dir: ${{ secrets.SOURCE_FOLDER }}
-        destination_dir: ${{ secrets.DESTINATION_FOLDER }}
-        rm: true
+        port: 22
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        source: ${{ secrets.SOURCE_FOLDER }}
+        target: ${{ secrets.DESTINATION_FOLDER }}
 
 
 
