@@ -1,0 +1,41 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Build the Docker image
+      run: docker build .--file dockerfile --tag my-image:latest
+      
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        
+    - name: Push Docker image to Docker Hub
+      run: docker push my-image:latest
+
+      
+     
+    - name: Set up AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-central-1a
+        
+    - name: Run containers on AWS ECS
+      run: |
+        # Replace this with your own command to deploy and run containers on AWS ECS
+        echo "Deploying containers to AWS ECS..."
+        # Example command for running a single container
+        # docker run -d --name my-container my-image:latest
+        # Example command for running multiple containers
+        # docker run -d --name pg postgres:13
+        # docker run -d --name adminer adminer:4.8.0
