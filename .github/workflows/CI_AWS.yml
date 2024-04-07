@@ -6,7 +6,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-
     steps:
     - name: list
       run: ls -la
@@ -16,7 +15,7 @@ jobs:
       run: ls -la
     
     - name: Build the Docker image
-      run: docker build . Dockerfile --tag my-image:latest
+      run: docker build . --file Dockerfile --tag my-image:latest
       
     - name: Log in to Docker Hub
       uses: docker/login-action@v1
@@ -26,15 +25,13 @@ jobs:
         
     - name: Push Docker image to Docker Hub
       run: docker push my-image:latest
-
       
-     
     - name: Set up AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: eu-central-1a
+        aws-region: us-east-1
         
     - name: Run containers on AWS ECS
       run: |
