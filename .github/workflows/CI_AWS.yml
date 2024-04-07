@@ -38,6 +38,13 @@
        runs-on: ubuntu-latest
        needs: [build]
        steps:
+       - name: list
+         run: ls -la
+         
+       - uses: actions/checkout@v3
+       - name: list
+         run: ls -la
+
 
        - name: Copy to Remote Server 
          uses: appleboy/scp-action@master
