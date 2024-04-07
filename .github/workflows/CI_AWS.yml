@@ -12,12 +12,11 @@ jobs:
       run: ls -la
       
     - uses: actions/checkout@v3
+    - name: list
+      run: ls -la
     
     - name: Build the Docker image
       run: docker build .--file dockerfile --tag my-image:latest
-
-    - name: list
-      run: ls -la
       
     - name: Log in to Docker Hub
       uses: docker/login-action@v1
