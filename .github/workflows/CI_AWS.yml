@@ -1,65 +1,83 @@
-name: CI
-
-on: [push]
-
-jobs:
-   build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: list
-      run: ls -la
-      
-    - uses: actions/checkout@v3
-    - name: list
-      run: ls -la
-    
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag abobec/first_ci:latest
-      
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-        
-    - name: Push Docker image to Docker Hub
-      run: docker push abobec/first_ci:latest
-      
-    - name: Set up AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
-        
-   deploy:
-     runs-on: ubuntu-latest
-     needs: [build]
-     steps:
-
-     - name: Copy to Remote Server
-       uses: appleboy/scp-action@master
-       with:  
-        host: ${{ secrets.DESTINATION_HOST }}
-        port: 22
-        username: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+   name: CI
+   
+   on: [push]
+   
+   jobs:
+      build:
+       runs-on: ubuntu-latest
+   
+       steps:
+       - name: list
+         run: ls -la
+         
+       - uses: actions/checkout@v3
+       - name: list
+         run: ls -la
        
-        source: "https://github.com/ABOBEC/firts-CI"
-        target: "/home/ubuntu/docker-run/"
-
-
-
-
-   # - name: Run containers on AWS ECS
-    #  run: |
-      #    scp /path/to/file username@a:/path/to/destination
-     
-        # Replace this with your own command to deploy and run containers on AWS ECS
-      #  echo "Deploying containers to AWS ECS..."
-        # Example command for running a single container
-        # docker run -d --name my-container my-image:latest
-        # Example command for running multiple containers
-        # docker run -d --name pg postgres:13
-        # docker run -d --name adminer adminer:4.8.0
+       - name: Build the Docker image
+         run: docker build . --file Dockerfile --tag abobec/first_ci:latest
+         
+       - name: Log in to Docker Hub
+         uses: docker/login-action@v2
+         with:
+           username: ${{ secrets.DOCKER_USERNAME }}
+           password: ${{ secrets.DOCKER_PASSWORD }}
+           
+       - name: Push Docker image to Docker Hub
+         run: docker push abobec/first_ci:latest
+         
+       - name: Set up AWS credentials
+         uses: aws-actions/configure-aws-credentials@v2
+         with:
+           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+           aws-region: us-east-1
+           
+   
+      deploy:
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@v2
+         - name: Set up QEMU
+           uses: docker/setup-qemu-action@v1
+         - name: Set up Docker Buildx
+           uses: docker/setup-buildx-action@v1
+         - name: Login to Docker Hub
+           uses: docker/login-action@v1
+           with:
+             username: ${{ secrets.DOCKER_USERNAME }}
+             password: ${{ secrets.DOCKER_PASSWORD }}
+         - name: Build and push
+           id: build_and_push
+           uses: docker/build-push-action@v2
+           with:
+             context: .
+             file: ./docker-compose.yml
+             push: true
+             tags: yourusername/yourimage:latest
+   
+         - name: Deploy to AWS EC2
+           uses: appleboy/ssh-action@master
+           with:
+             host: "18.153.120.172"
+             username: "ubuntu"
+             key: ${{ secrets.SSH_KEY }}
+             script: |
+               cd /path/to/your/app
+               docker-compose pull
+               docker-compose up -d
+   
+   
+   
+   
+      # - name: Run containers on AWS ECS
+       #  run: |
+         #    scp /path/to/file username@a:/path/to/destination
+        
+           # Replace this with your own command to deploy and run containers on AWS ECS
+         #  echo "Deploying containers to AWS ECS..."
+           # Example command for running a single container
+           # docker run -d --name my-container my-image:latest
+           # Example command for running multiple containers
+           # docker run -d --name pg postgres:13
+           # docker run -d --name adminer adminer:4.8.0
