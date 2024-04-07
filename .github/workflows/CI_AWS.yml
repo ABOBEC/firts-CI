@@ -15,7 +15,7 @@ jobs:
       run: ls -la
     
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --abobec/first_ci:latest
+      run: docker build . --file Dockerfile --tag abobec/first_ci:latest
       
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
