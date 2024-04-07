@@ -61,8 +61,16 @@
    
    
    
-      # - name: Run containers on AWS ECS
-       #  run: |
+       - name: Run containers on AWS ECS
+         uses: aws-actions/configure-aws-credentials@v2
+         with:
+           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+           aws-region: us-east-1
+           run: |
+            cd /home/ubuntu/docker-run/
+            docker-compose up -d --name docker-compose.yml 
+
          #    scp /path/to/file username@a:/path/to/destination
         
            # Replace this with your own command to deploy and run containers on AWS ECS
