@@ -39,7 +39,7 @@ jobs:
      steps:
 
      - name: Copy to Remote Server
-       uses: pierrickdelrieu/scp-action@v0.1.1
+       uses: appleboy/scp-action@v0.1.7
        with:
         host: ${{ secrets.DESTINATION_HOST }}
         ssh_port: 22
