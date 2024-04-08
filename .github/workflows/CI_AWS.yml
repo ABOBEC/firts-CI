@@ -57,19 +57,22 @@
           source: "./docker-compose.yml"
           target: "/home/ubuntu/docker-run/"
 
-   
-   
-   
-   
-       - name: Run containers on AWS ECS
-         uses: aws-actions/configure-aws-credentials@v3
+       - name: Deploy to AWS EC2
+         uses: appleboy/ssh-action@master
          with:
-           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-           aws-region: us-east-1
-           run: |
-            cd /home/ubuntu/docker-run/
-            docker-compose up -d --name docker-compose.yml 
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /home/ubuntu/docker-run/docker-compose.yml
+            docker-compose pull
+            docker-compose up -d
+
+   
+   
+   
+   
+      
 
          #    scp /path/to/file username@a:/path/to/destination
         
