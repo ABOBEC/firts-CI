@@ -65,7 +65,7 @@
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/ubuntu/docker-run
-            sudo docker run
+            sudo docker run abobec/first_ci:latest
 
    
    
