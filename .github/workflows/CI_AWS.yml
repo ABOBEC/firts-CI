@@ -46,16 +46,16 @@
          run: ls -la
 
 
-       - name: Copy to Remote Server 
-         uses: appleboy/scp-action@master
-         with:  
-          host: "18.153.120.172"
-          port: 22
-          username: "ubuntu"
+       - name: Pull to Remote Server 
+         uses: appleboy/ssh-action@master
+         with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-       
-          source: "./docker-compose.yml"
-          target: "/home/ubuntu/docker-run/"
+          script: |
+            cd /home/ubuntu/docker-run
+            sudo docker pull abobec/first_ci
+
 
        - name: Deploy to AWS EC2
          uses: appleboy/ssh-action@master
@@ -65,7 +65,7 @@
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/ubuntu/docker-run
-            sudo docker-compose up -d
+            sudo docker run
 
    
    
