@@ -24,7 +24,7 @@
            password: ${{ secrets.DOCKER_PASSWORD }}
            
        - name: Push Docker image to Docker Hub
-         run: docker push abobec/first_ci:latest
+         run: docker push abobec/first_ci:${{ github.sha }}
          
        - name: Set up AWS credentials
          uses: aws-actions/configure-aws-credentials@v3
