@@ -67,12 +67,4 @@
    
       
 
-         #    scp /path/to/file username@a:/path/to/destination
-        
-           # Replace this with your own command to deploy and run containers on AWS ECS
-         #  echo "Deploying containers to AWS ECS..."
-           # Example command for running a single container
-           # docker run -d --name my-container my-image:latest
-           # Example command for running multiple containers
-           # docker run -d --name pg postgres:13
-           # docker run -d --name adminer adminer:4.8.0
+       
