@@ -1,7 +1,7 @@
 services:
 
   ptcript:
-    image: abobec/first_ci
+    image: abobec/first_ci:latest
     restart: 'no'
     links:
       - "db:database"
