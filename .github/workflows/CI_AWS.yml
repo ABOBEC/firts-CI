@@ -15,7 +15,7 @@
          run: ls -la
        
        - name: Build the Docker image
-         run: docker build . --file Dockerfile --tag abobec/first_ci:${{ github.sha }}
+         run: docker build . --file Dockerfile --tag abobec/first_ci:${{ github.sha }} --tag abobec/first_ci:latest
          
        - name: Log in to Docker Hub
          uses: docker/login-action@v2
