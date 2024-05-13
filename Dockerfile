@@ -1,4 +1,4 @@
-FROM ${DOCKER_IMAGE}:${DOCKER_TAG}
+FROM ${{ DOCKER_IMAGE }}:${{ DOCKER_TAG }}
 
 WORKDIR /usr/src/app
 
