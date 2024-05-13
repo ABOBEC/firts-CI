@@ -7,12 +7,8 @@
        runs-on: ubuntu-latest
    
        steps:
-       - name: list
-         run: ls -la
          
        - uses: actions/checkout@v3
-       - name: list
-         run: ls -la
        
        - name: Build the Docker image
          run: docker build . --file Dockerfile --tag abobec/first_ci:${{ github.sha }} --tag abobec/first_ci:latest
@@ -24,7 +20,7 @@
            password: ${{ secrets.DOCKER_PASSWORD }}
            
        - name: Push Docker image to Docker Hub
-         run: docker push abobec/first_ci:${{ github.sha }}
+         run: docker push abobec/first_ci:latest
          
        - name: Set up AWS credentials
          uses: aws-actions/configure-aws-credentials@v3
