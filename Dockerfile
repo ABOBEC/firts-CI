@@ -1,4 +1,4 @@
-FROM abobec/first_ci:${DOCKER_TAG}
+FROM python:3-alpine
 
 WORKDIR /usr/src/app
 
