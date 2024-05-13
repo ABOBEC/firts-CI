@@ -1,4 +1,4 @@
-FROM python:3-alpine
+FROM ${DOCKER_IMAGE}:${DOCKER_TAG}
 
 WORKDIR /usr/src/app
 
