@@ -42,7 +42,7 @@ jobs:
 
       - name: Update docker-compose.yml with new image tag
         run: |
-          yq e '.services.abobec/first_ci:latest = "abobec/first_ci:${{ github.sha }}"' -i docker-compose.yml
+          yq e '.services.ptcript.abobec/first_ci = "abobec/first_ci:${{ github.sha }}"' -i docker-compose.yml
 
       - name: Copy to Remote Server
         uses: appleboy/scp-action@master
