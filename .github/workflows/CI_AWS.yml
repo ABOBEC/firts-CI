@@ -39,14 +39,12 @@ jobs:
 
       - name: Install yq
         run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-pip
-          pip3 install yq
+          sudo wget https://github.com/mikefarah/yq/releases/download/v4.18.1/yq_linux_amd64 -O /usr/bin/yq
+          sudo chmod +x /usr/bin/yq
 
       - name: Update docker-compose.yml with new image tag
         run: |
-          export IMAGE_TAG="abobec/first_ci:${{ github.sha }}"
-          yq e '.services.ptcript.image = env(IMAGE_TAG)' -i docker-compose.yml
+          yq eval '.services.ptcript.image = "abobec/first_ci:${{ github.sha }}"' -i docker-compose.yml
 
       - name: Copy to Remote Server
         uses: appleboy/scp-action@master
@@ -66,5 +64,4 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/ubuntu/docker-run
-            sudo docker-compose down
             sudo docker-compose up -d
