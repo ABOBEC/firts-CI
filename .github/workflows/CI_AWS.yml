@@ -1,84 +1,68 @@
-   name: CI
-   
-   on: [push]
-   
-   jobs:
-      build:
-       runs-on: ubuntu-latest
-   
-       steps:
-       - name: list
-         run: ls -la
-         
-       - uses: actions/checkout@v3
-       - name: list
-         run: ls -la
-       
-       - name: Build the Docker image
-         run: docker build . --file Dockerfile --tag abobec/first_ci:latest
-         
-       - name: Log in to Docker Hub
-         uses: docker/login-action@v2
-         with:
-           username: ${{ secrets.DOCKER_USERNAME }}
-           password: ${{ secrets.DOCKER_PASSWORD }}
-           
-       - name: Push Docker image to Docker Hub
-         run: docker push abobec/first_ci:latest
-         
-       - name: Set up AWS credentials
-         uses: aws-actions/configure-aws-credentials@v3
-         with:
-           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-           aws-region: us-east-1
-           
-   
-      deploy:
-       runs-on: ubuntu-latest
-       needs: [build]
-       steps:
-       - name: list
-         run: ls -la
-         
-       - uses: actions/checkout@v3
-       - name: list
-         run: ls -la
+name: CI
 
+on: [push]
 
-       - name: Copy to Remote Server 
-         uses: appleboy/scp-action@master
-         with:  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag abobec/first_ci:${{ github.sha }} --tag abobec/first_ci:latest
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - run: echo "${{ secrets.DOCKER_IMAGE }}" >> .env
+      - run: echo "${{ github.sha }}" >> .env
+
+      - name: Push Docker image to Docker Hub
+        run: docker push abobec/first_ci:${{ github.sha }}
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install yq
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/download/v4.18.1/yq_linux_amd64 -O /usr/bin/yq
+          sudo chmod +x /usr/bin/yq
+
+      - name: Update docker-compose.yml with new image tag
+        run: |
+          yq eval '.services.ptcript.image = "abobec/first_ci:${{ github.sha }}"' -i docker-compose.yml
+
+      - name: Copy to Remote Server
+        uses: appleboy/scp-action@master
+        with:
           host: "18.153.120.172"
           port: 22
           username: "ubuntu"
           key: ${{ secrets.SSH_KEY }}
-       
           source: "./docker-compose.yml"
           target: "/home/ubuntu/docker-run/"
 
-       - name: Deploy to AWS EC2
-         uses: appleboy/ssh-action@master
-         with:
+      - name: Deploy to AWS EC2
+        uses: appleboy/ssh-action@master
+        with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/ubuntu/docker-run
+            sudo docker-compose down
             sudo docker-compose up -d
-
-   
-   
-   
-   
-      
-
-         #    scp /path/to/file username@a:/path/to/destination
-        
-           # Replace this with your own command to deploy and run containers on AWS ECS
-         #  echo "Deploying containers to AWS ECS..."
-           # Example command for running a single container
-           # docker run -d --name my-container my-image:latest
-           # Example command for running multiple containers
-           # docker run -d --name pg postgres:13
-           # docker run -d --name adminer adminer:4.8.0
