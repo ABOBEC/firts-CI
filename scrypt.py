@@ -5,30 +5,35 @@ from flask import Flask, jsonify
 
 app = Flask(__name__)
 
-def get_db_connection():
-    connection = psycopg2.connect(user=os.environ["DB_USER"],
-                                  password=os.environ["DB_PASS"],
-                                  host=os.environ["DB_HOST"],
-                                  port=os.environ["DB_PORT"],
-                                  database=os.environ["DB_NAME"])
-    return connection
-
-@app.route('/count', methods=['GET'])
-def get_mobile_count():
+@app.route('/count')
+def count():
     try:
-        connection = get_db_connection()
-        cursor = connection.cursor()
-        cursor.execute("SELECT count(*) FROM mobile")
-        count = cursor.fetchone()[0]
-        return jsonify({"count": count})
-    except (Exception, psycopg2.Error) as error:
-        return jsonify({"error": str(error)})
-    finally:
-        if connection:
-            cursor.close()
-            connection.close()
+        connection = psycopg2.connect(
+                    user=os.environ["DB_USER"],
+                    password=os.environ["DB_PASS"],
+                    host=os.environ["DB_HOST"],
+                    port=os.environ["DB_PORT"],
+                    database=os.environ["DB_NAME"]
+        )
+        cur = conn.cursor()
+        cur.execute('SELECT count(*) FROM mobile')
+        result = cur.fetchone()
+        cur.close()
+        conn.close()
+        return jsonify(count=result[0])
+    except Exception as e:
+        return str(e), 500
+
+@app.route('/healthz')
+def healthz():
+    return 'OK', 200
+
+@app.route('/readiness')
+def readiness():
+    return 'READY', 200
 
 if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000)
     # Даем время базе данных запуститься
     time.sleep(40)
     
