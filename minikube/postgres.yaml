@@ -1,41 +1,48 @@
+# Определяем, что этот файл описывает объект Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres
+  name: postgres # Имя Deployment
 spec:
-  replicas: 1
+  replicas: 1 # Количество подов, которые мы хотим запустить
   selector:
     matchLabels:
-      app: postgres
+      app: postgres # Метка, по которой Kubernetes будет идентифицировать поды этого Deployment
   template:
     metadata:
       labels:
-        app: postgres
+        app: postgres # Метка, присваиваемая подам, созданным этим Deployment
     spec:
       containers:
-        - name: postgres
-          image: postgres:alpine
+        - name: postgres # Имя контейнера
+          image: postgres:alpine # Образ контейнера, который будет использован
           ports:
-            - containerPort: 5432
+            - containerPort: 5432 # Порт, который будет открыт внутри контейнера
           env:
             - name: POSTGRES_USER
-              value: "user"
+              value: "user" # Устанавливаем переменную окружения POSTGRES_USER внутри контейнера
             - name: POSTGRES_PASSWORD
-              value: "user"
-          volumeMounts:
-            - mountPath: /var/lib/postgresql/data
-              name: postgres-storage
-      volumes:
-        - name: postgres-storage
-          emptyDir: {}
+              value: "user" # Устанавливаем переменную окружения POSTGRES_PASSWORD внутри контейнера
+##         volumeMounts:
+##            - mountPath: /var/lib/postgresql/data # Точка монтирования для volumes
+##              name: postgres-storage # Ссылка на volume, который будет смонтирован
+          livenessProbe: # Настройка Liveness Probe
+            exec:
+              command:
+                - pg_isready # Команда, которая будет выполнена внутри контейнера
+                - -U # Указывает пользователя для pg_isready
+                - user # Имя пользователя
+            initialDelaySeconds: 5 # Задержка перед первой проверкой после старта контейнера
+            periodSeconds: 10 # Интервал между проверками
 ---
+# Определяем объект Service для PostgreSQL
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres
+  name: postgres # Имя Service
 spec:
-  type: ClusterIP
+  type: ClusterIP # Тип Service, который делает его доступным только внутри кластера
   ports:
-    - port: 5432
+    - port: 5432 # Порт, на который будет доступен сервис
   selector:
-    app: postgres
+    app: postgres # Метка, по которой будет найден нужный под для направления трафика
