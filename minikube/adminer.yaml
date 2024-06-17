@@ -1,4 +1,3 @@
-# Определяет API версию и тип объекта, который будет создан (Deployment)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,8 +13,8 @@ spec:
         app: adminer # Метка, присваиваемая каждому поду, созданному этим Deployment
     spec:
       containers:
-        - name: adminer # Имя контейнера
-          image: adminer # Образ контейнера, из которого будет создан контейнер
+        - name: adminer 
+          image: adminer 
           ports:
             - containerPort: 8080 # Порт, который будет открыт внутри контейнера
           livenessProbe: # Настройка Liveness Probe для проверки живучести контейнера
@@ -26,7 +25,6 @@ spec:
             initialDelaySeconds: 5  # Задержка перед первой проверкой после старта контейнера
             periodSeconds: 10       # Интервал между проверками
 ---
-# Определяет API версию и тип объекта, который будет создан (Service)
 apiVersion: v1
 kind: Service
 metadata:
