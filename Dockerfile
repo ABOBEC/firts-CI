@@ -8,7 +8,7 @@ ENV DB_HOST="db" \
     DB_PASS="user" \
     DB_NAME="user"
 
-RUN pip install psycopg2-binary flask
+RUN pip install psycopg2-binary flask healthcheck
 RUN adduser -D newuser
 USER newuser 
 
