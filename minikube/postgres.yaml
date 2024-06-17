@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres # Имя Deployment
+  name: db # Имя Deployment
 spec:
   replicas: 1 # Количество подов, которые мы хотим запустить
   selector:
     matchLabels:
-      app: postgres # Метка, по которой Kubernetes будет идентифицировать поды этого Deployment
+      app: db # Метка, по которой Kubernetes будет идентифицировать поды этого Deployment
   template:
     metadata:
       labels:
-        app: postgres # Метка, присваиваемая подам, созданным этим Deployment
+        app: db # Метка, присваиваемая подам, созданным этим Deployment
     spec:
       containers:
-        - name: postgres 
-          image: postgres:alpine 
+        - name: db 
+          image: db:alpine 
           ports:
             - containerPort: 5432 # Порт, который будет открыт внутри контейнера
           env:
-            - name: POSTGRES_USER
+            - name: db_USER
               value: "user" 
-            - name: POSTGRES_PASSWORD
+            - name: db_PASSWORD
               value: "user" 
 
           livenessProbe:
@@ -35,10 +35,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres # Имя Service
+  name: db # Имя Service
 spec:
   type: ClusterIP # Тип Service, который делает его доступным только внутри кластера
   ports:
     - port: 5432 # Порт, на который будет доступен сервис
   selector:
-    app: postgres # Метка, по которой будет найден нужный под для направления трафика
+    app: db # Метка, по которой будет найден нужный под для направления трафика

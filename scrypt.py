@@ -6,6 +6,9 @@ from healthcheck import HealthCheck # Импортируем библиотек�
 
 app = Flask(__name__)
 
+# Глобальная переменная для отслеживания готовности
+is_ready = False
+
 def get_db_connection():
     connection = psycopg2.connect(user=os.environ["DB_USER"],
                                   password=os.environ["DB_PASS"],
@@ -57,6 +60,7 @@ if __name__ == '__main__':
         connection.commit()  
 
         # Устанавливаем флаг готовности
+        global is_ready
         is_ready = True
 
         cursor.close()  # Закрываем курсор
@@ -65,46 +69,23 @@ if __name__ == '__main__':
         print("Ошибка при работе с PostgreSQL", error)  # Выводим ошибку, если возникла проблема
         is_ready = False
 
-# Запуск функции подключения к базе данных в фоновом режиме
-connect_db()
+    # Создаем экземпляр HealthCheck
+    health = HealthCheck(app, "/healthz")
+    readiness = HealthCheck(app, "/readiness")
 
-# Создаем экземпляр HealthCheck
-health = HealthCheck(app, "/healthz")
-readiness = HealthCheck(app, "/readiness")
+    # Функция для проверки живости
+    def liveness_check():
+        return True, "alive"
 
-# Функция для проверки живости
-def liveness_check():
-    return True, "alive"
+    # Функция для проверки готовности
+    def readiness_check():
+        if is_ready:
+            return True, "ready"
+        else:
+            return False, "not ready"
 
-# Функция для проверки готовности
-def readiness_check():
-    if is_ready:
-        return True, "ready"
-    else:
-        return False, "not ready"
+    # Добавляем проверки в HealthCheck
+    health.add_check(liveness_check)
+    readiness.add_check(readiness_check)
 
-# Добавляем проверки в HealthCheck
-health.add_check(liveness_check)
-readiness.add_check(readiness_check)
-
-@app.route('/count')
-def count():
-    try:
-        connection = psycopg2.connect(  # Подключаемся к базе данных PostgreSQL
-            user=os.environ["DB_USER"],  
-            password=os.environ["DB_PASS"],  
-            host=os.environ["DB_HOST"],  
-            port=os.environ["DB_PORT"], 
-            database=os.environ["DB_NAME"]  
-        )
-        cursor = connection.cursor()  # Создаем курсор для выполнения SQL-запросов
-        cursor.execute("SELECT COUNT(*) FROM mobile")  
-        count = cursor.fetchone()[0]  
-        cursor.close()  
-        connection.close()  
-        return jsonify(count=count), 200  # Возвращаем количество записей и статус 200
-    except (Exception, psycopg2.Error) as error:
-        return jsonify(error=str(error)), 500  # Возвращаем ошибку и статус 500, если возникла проблема
-
-if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)  # Запускаем Flask приложение на порту 8000
