@@ -1,4 +1,3 @@
-# Определяем, что этот файл описывает объект Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,15 +13,15 @@ spec:
         app: postgres # Метка, присваиваемая подам, созданным этим Deployment
     spec:
       containers:
-        - name: postgres # Имя контейнера
-          image: postgres:alpine # Образ контейнера, который будет использован
+        - name: postgres 
+          image: postgres:alpine 
           ports:
             - containerPort: 5432 # Порт, который будет открыт внутри контейнера
           env:
             - name: POSTGRES_USER
-              value: "user" # Устанавливаем переменную окружения POSTGRES_USER внутри контейнера
+              value: "user" 
             - name: POSTGRES_PASSWORD
-              value: "user" # Устанавливаем переменную окружения POSTGRES_PASSWORD внутри контейнера
+              value: "user" 
 ##         volumeMounts:
 ##            - mountPath: /var/lib/postgresql/data # Точка монтирования для volumes
 ##              name: postgres-storage # Ссылка на volume, который будет смонтирован
@@ -35,14 +34,13 @@ spec:
             initialDelaySeconds: 5 # Задержка перед первой проверкой после старта контейнера
             periodSeconds: 10 # Интервал между проверками
 ---
-# Определяем объект Service для PostgreSQL
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres # Имя Service
+  name: postgres 
 spec:
   type: ClusterIP # Тип Service, который делает его доступным только внутри кластера
   ports:
-    - port: 5432 # Порт, на который будет доступен сервис
+    - port: 5432 # Порт, по которому будет доступен сервис
   selector:
     app: postgres # Метка, по которой будет найден нужный под для направления трафика
