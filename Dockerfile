@@ -8,10 +8,11 @@ ENV DB_HOST="db" \
     DB_PASS="user" \
     DB_NAME="user"
 
-RUN pip install psycopg2-binary flask healthcheck
+RUN pip install psycopg2-binary flask py-healthcheck
 RUN adduser -D newuser
 USER newuser 
 
 COPY . /PG
 
 CMD ["python", "/PG/scrypt.py"]
+#

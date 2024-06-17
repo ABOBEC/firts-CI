@@ -1,43 +1,56 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: Deployment # Cоздаем объект типа Deployment
 metadata:
-  name: ptcript
+  name: ptscript # Имя Deployment, используется для идентификации этого ресурса в кластере
 spec:
-  replicas: 1
-  selector:
+  replicas: 1 # Количество подов, которые должны быть запущены
+  selector: #Определяет, какие поды принадлежат этому Deployment, используя метки
     matchLabels:
-      app: ptcript
+      app: ptscript # Метка, используемая для выбора подов, которые принадлежат этому Deployment
   template:
     metadata:
       labels:
-        app: ptcript
+        app: ptscript # Метка, присваиваемая каждому поду, созданному этим Deployment
     spec:
-      containers:
-        - name: ptcript
-          image: abobec/first_ci:58f467ad8c951dacc549818ab46c7417944f274d
-          env:
-            - name: DB_HOST
-              value: "postgres"
-            - name: DB_PORT
-              value: "5432"
-            - name: DB_USER
-              value: "user"
-            - name: DB_PASS
-              value: "user"
-            - name: DB_NAME
-              value: "user"
-          ports:
-            - containerPort: 8000
+      containers: #Спецификации для подов
+        - name: ptscript 
+          image: abobec/first_ci:072edd606e55b81e8af39fc82906b23ee2ee52fe
+          ports: #Список портов, которые будут открыты в контейнере
+            - containerPort: 8000 
+
+          livenessProbe:
+            # Проверка состояния Liveness: приложение отвечает на запрос по /healthz
+            httpGet:
+              path: /healthz # Путь для HTTP GET запроса для проверки Liveness
+              port: 8000 # Порт для HTTP GET запроса для проверки Liveness
+            initialDelaySeconds: 5 
+            periodSeconds: 10
+
+          startupProbe:
+            # Упреждение на долгий запуск контейнера с postgres
+            httpGet:
+              path: /healthz # Путь для HTTP GET запроса такой же как у Liveness
+              port: liveness-port # Порт для HTTP GET запроса такой же как у Liveness
+            failureThreshold: 5 # Время для завершения старта (6 * 10 секунд)
+            periodSeconds: 10
+
+          readinessProbe:
+            # Проверка состояния Readiness: приложение готово обрабатывать запросы по /readiness
+            httpGet:
+              path: /readiness # Путь для HTTP GET запроса для проверки Readiness
+              port: 8000 # Порт для HTTP GET запроса для проверки Readiness
+            initialDelaySeconds: 5  # Задержка перед первой проверкой после старта контейнера
+            periodSeconds: 10       # Интервал между проверками
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: ptcript-service
+  name: ptcript-service # Имя Service, используется для идентификации этого ресурса в кластере
 spec:
   selector:
-    app: ptcript
+    app: ptcript # Метка, используемая для выбора подов, которым будет направляться трафик
   ports:
-    - protocol: TCP
-      port: 8000
-      targetPort: 8000
-  type: LoadBalancer
+    - protocol: TCP # Протокол для Service (TCP)
+      port: 8000 # Порт, который будет открыт внутри кластера
+      targetPort: 8000 # Порт на контейнере, на который будет направляться трафик
+  type: LoadBalancer # Тип Service, который создает внешний IP для доступа к сервису

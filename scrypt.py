@@ -2,28 +2,42 @@ import psycopg2  # Библиотека для работы с PostgreSQL
 import os  # Модуль для работы с переменными окружения
 import time  # Модуль для работы с временем (для задержек)
 from flask import Flask, jsonify  # Flask для создания веб-приложения, jsonify для возврата JSON-ответов
-from healthcheck import HealthCheck  # Импортируем библиотеку healthcheck
+from healthcheck import HealthCheck # Импортируем библиотеку healthcheck
 
-app = Flask(__name__)  # Создаем экземпляр Flask
+app = Flask(__name__)
 
-# Глобальная переменная для отслеживания состояния готовности
-is_ready = False
+def get_db_connection():
+    connection = psycopg2.connect(user=os.environ["DB_USER"],
+                                  password=os.environ["DB_PASS"],
+                                  host=os.environ["DB_HOST"],
+                                  port=os.environ["DB_PORT"],
+                                  database=os.environ["DB_NAME"])
+    return connection
 
-# Функция для подключения к базе данных
-def connect_db():
-    global is_ready  # Используем глобальную переменную is_ready
+@app.route('/count', methods=['GET'])
+def get_mobile_count():
     try:
-        time.sleep(40)  # Задержка в 40 секунд для ожидания готовности базы данных
-        connection = psycopg2.connect(  
-            user=os.environ["DB_USER"],  
-            password=os.environ["DB_PASS"],  
-            host=os.environ["DB_HOST"],  
-            port=os.environ["DB_PORT"],  
-            database=os.environ["DB_NAME"]  
-        )
-        cursor = connection.cursor()  # Создаем курсор для выполнения SQL-запросов
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute("SELECT count(*) FROM mobile")
+        count = cursor.fetchone()[0]
+        return jsonify({"count": count})
+    except (Exception, psycopg2.Error) as error:
+        return jsonify({"error": str(error)})
+    finally:
+        if connection:
+            cursor.close()
+            connection.close()
 
-        # Создаем таблицу, если она еще не существует
+if __name__ == '__main__':
+    # Даем время базе данных запуститься
+    time.sleep(40)
+    
+    # Подключение к базе данных и создание таблицы
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        
         create_table_query = '''CREATE TABLE IF NOT EXISTS mobile
                               (ID INT PRIMARY KEY NOT NULL,
                               MODEL TEXT NOT NULL,
