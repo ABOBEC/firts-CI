@@ -1,11 +1,10 @@
-# Определяет API версию и тип объекта, который будет создан (Deployment)
 apiVersion: apps/v1
-kind: Deployment
+kind: Deployment # Cоздаем объект типа Deployment
 metadata:
   name: ptscript # Имя Deployment, используется для идентификации этого ресурса в кластере
 spec:
   replicas: 1 # Количество подов, которые должны быть запущены
-  selector:
+  selector: 
     matchLabels:
       app: ptscript # Метка, используемая для выбора подов, которые принадлежат этому Deployment
   template:
@@ -13,10 +12,10 @@ spec:
       labels:
         app: ptscript # Метка, присваиваемая каждому поду, созданному этим Deployment
     spec:
-      containers:
+      containers: 
         - name: ptscript # Имя контейнера
           image: abobec/first_ci:72b83a2f114fd7ca359c0e2030dbc34d519380f3 # Образ контейнера, из которого будет создан контейнер
-          ports:
+          ports: 
             - containerPort: 8000 # Порт, который будет открыт внутри контейнера
           livenessProbe:
             # Проверка состояния Liveness: приложение отвечает на запрос по /healthz
@@ -33,8 +32,6 @@ spec:
             initialDelaySeconds: 50  # Задержка перед первой проверкой после старта контейнера
             periodSeconds: 10       # Интервал между проверками
 ---
-
-# Определяет API версию и тип объекта, который будет создан (Service)
 apiVersion: v1
 kind: Service
 metadata:
