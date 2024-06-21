@@ -78,6 +78,9 @@ def readiness_check():
         return True, "ready"
     else:
         return False, "not ready"
+# Add a flask route to expose information
+app.add_url_rule("/healthcheck", "healthcheck", view_func=lambda: health.run())
+app.add_url_rule("/environment", "environment", view_func=lambda: envdump.run())
 
 # Добавляем проверки в HealthCheck
 health.add_check(liveness_check)
