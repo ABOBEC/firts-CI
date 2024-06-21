@@ -6,7 +6,6 @@ from healthcheck import HealthCheck  # Импортируем библиотек
 
 app = Flask(__name__)
 
-health = HealthCheck(app, "/healthcheck")
 # Глобальная переменная для отслеживания готовности
 is_ready = False
 
