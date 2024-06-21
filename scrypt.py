@@ -85,7 +85,7 @@ readiness.add_check(readiness_check)
 
 if __name__ == '__main__':
     # Даем время базе данных запуститься
-    time.sleep(40)
+   # time.sleep(40)
     
     # Инициализируем базу данных
     initialize_database()
