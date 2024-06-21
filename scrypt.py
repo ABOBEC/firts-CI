@@ -2,13 +2,14 @@ import psycopg2  # Библиотека для работы с PostgreSQL
 import os  # Модуль для работы с переменными окружения
 import time  # Модуль для работы с временем (для задержек)
 from flask import Flask, jsonify  # Flask для создания веб-приложения, jsonify для возврата JSON-ответов
-from healthcheck import HealthCheck  # Импортируем библиотеку healthcheck
+from healthcheck import HealthCheck, EnvironmentDump  # Импортируем библиотеку healthcheck
 
 app = Flask(__name__)
 
 # Глобальная переменная для отслеживания готовности
 is_ready = False
 
+# Функция для получения подключения к базе данных
 def get_db_connection():
     return psycopg2.connect(user=os.environ["DB_USER"],
                             password=os.environ["DB_PASS"],
@@ -16,12 +17,14 @@ def get_db_connection():
                             port=os.environ["DB_PORT"],
                             database=os.environ["DB_NAME"])
 
+# Функция для инициализации базы данных
 def initialize_database():
     global is_ready
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
 
+        # Создаем таблицу, если ее не существует
         create_table_query = '''CREATE TABLE IF NOT EXISTS mobile
                               (ID INT PRIMARY KEY NOT NULL,
                               MODEL TEXT NOT NULL,
@@ -49,6 +52,7 @@ def initialize_database():
         print("Ошибка при работе с PostgreSQL", error)
         is_ready = False
 
+# Маршрут для получения количества записей в таблице mobile
 @app.route('/count', methods=['GET'])
 def get_mobile_count():
     try:
@@ -65,14 +69,14 @@ def get_mobile_count():
             connection.close()
 
 # Создаем экземпляр HealthCheck
-health = HealthCheck(app, "/healthz")
-readiness = HealthCheck(app, "/readiness")
+health = HealthCheck()
+readiness = HealthCheck()
 
-# Функция для проверки живости
+# Функция для проверки живости (Liveness Check)
 def liveness_check():
     return True, "alive"
 
-# Функция для проверки готовности
+# Функция для проверки готовности (Readiness Check)
 def readiness_check():
     if is_ready:
         return True, "ready"
@@ -83,13 +87,13 @@ def readiness_check():
 health.add_check(liveness_check)
 readiness.add_check(readiness_check)
 
-# Add a flask route to expose information
-app.add_url_rule("/healthcheck", "healthcheck", view_func=lambda: health.run())
-app.add_url_rule("/environment", "environment", view_func=lambda: envdump.run())
+# Добавляем маршруты для проверки состояния
+app.add_url_rule("/healthz", "healthz", view_func=lambda: health.run())
+app.add_url_rule("/readiness", "readiness", view_func=lambda: readiness.run())
 
 if __name__ == '__main__':
     # Даем время базе данных запуститься
-   # time.sleep(40)
+    time.sleep(40)
     
     # Инициализируем базу данных
     initialize_database()
