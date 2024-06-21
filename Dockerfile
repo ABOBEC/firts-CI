@@ -14,5 +14,5 @@ USER newuser
 
 COPY . /PG
 
-CMD ["python", "/PG/scrypt.py"]
-#
+#CMD ["python", "/PG/scrypt.py"]
+CMD ["python", "/usr/src/app/scrypt.py"]
