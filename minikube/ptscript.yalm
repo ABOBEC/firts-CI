@@ -1,56 +1,44 @@
 apiVersion: apps/v1
-kind: Deployment # Cоздаем объект типа Deployment
+kind: Deployment
 metadata:
-  name: ptscript # Имя Deployment, используется для идентификации этого ресурса в кластере
+  name: ptscript
 spec:
-  replicas: 1 # Количество подов, которые должны быть запущены
-  selector: #Определяет, какие поды принадлежат этому Deployment, используя метки
+  replicas: 1
+  selector:
     matchLabels:
-      app: ptscript # Метка, используемая для выбора подов, которые принадлежат этому Deployment
+      app: ptscript
   template:
     metadata:
       labels:
-        app: ptscript # Метка, присваиваемая каждому поду, созданному этим Deployment
+        app: ptscript
     spec:
-      containers: #Спецификации для подов
-        - name: ptscript 
-          image: abobec/first_ci:072edd606e55b81e8af39fc82906b23ee2ee52fe
-          ports: #Список портов, которые будут открыты в контейнере
-            - containerPort: 8000 
-
+      containers:
+        - name: ptscript
+          image: abobec/first_ci:922a5a7ec3061dbcda20f1e4cbf1ac9ae5b05d79
+          ports:
+            - containerPort: 8000
           livenessProbe:
-            # Проверка состояния Liveness: приложение отвечает на запрос по /healthz
             httpGet:
-              path: /healthz # Путь для HTTP GET запроса для проверки Liveness
-              port: 8000 # Порт для HTTP GET запроса для проверки Liveness
-            initialDelaySeconds: 5 
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 10
             periodSeconds: 10
-
-          startupProbe:
-            # Упреждение на долгий запуск контейнера с postgres
-            httpGet:
-              path: /healthz # Путь для HTTP GET запроса такой же как у Liveness
-              port: liveness-port # Порт для HTTP GET запроса такой же как у Liveness
-            failureThreshold: 5 # Время для завершения старта (6 * 10 секунд)
-            periodSeconds: 10
-
           readinessProbe:
-            # Проверка состояния Readiness: приложение готово обрабатывать запросы по /readiness
             httpGet:
-              path: /readiness # Путь для HTTP GET запроса для проверки Readiness
-              port: 8000 # Порт для HTTP GET запроса для проверки Readiness
-            initialDelaySeconds: 5  # Задержка перед первой проверкой после старта контейнера
-            periodSeconds: 10       # Интервал между проверками
+              path: /readiness
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: ptcript-service # Имя Service, используется для идентификации этого ресурса в кластере
+  name: ptscript-service
 spec:
   selector:
-    app: ptcript # Метка, используемая для выбора подов, которым будет направляться трафик
+    app: ptscript
   ports:
-    - protocol: TCP # Протокол для Service (TCP)
-      port: 8000 # Порт, который будет открыт внутри кластера
-      targetPort: 8000 # Порт на контейнере, на который будет направляться трафик
-  type: LoadBalancer # Тип Service, который создает внешний IP для доступа к сервису
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: LoadBalancer

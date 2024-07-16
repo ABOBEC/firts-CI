@@ -92,8 +92,6 @@ app.add_url_rule("/healthz", "healthz", view_func=lambda: health.run())
 app.add_url_rule("/readiness", "readiness", view_func=lambda: readiness.run())
 
 if __name__ == '__main__':
-    # Даем время базе данных запуститься
-    #time.sleep(40)
     
     # Инициализируем базу данных
     initialize_database()
